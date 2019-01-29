@@ -46,7 +46,7 @@ angular.module('cwill747.phonenumber', [])
       },
       controllerAs: '',
       controller: function() {
-        this.countryCode = this.countryCode || 'us';
+        //allow countryCode to be null
       },
       link: function(scope, element, attrs, ctrl) {
         var el = element[0];
@@ -105,14 +105,18 @@ angular.module('cwill747.phonenumber', [])
         }
 
         function validator(value) {
-          var isValidForRegion = false;
+          var isValidNumber = false;
           try {
-            isValidForRegion = $window.phoneUtils.isValidNumberForRegion(value, scope.countryCode);
+            if (scope.countryCode) {
+              isValidNumber = $window.phoneUtils.isValidNumberForRegion(value, scope.countryCode);
+            } else {
+              isValidNumber = $window.phoneUtils.isValidNumber(value);
+            }
           }
           catch (err) {
             $log.debug(err);
           }
-          var valid = ctrl.$isEmpty(value) || isValidForRegion;
+          var valid = ctrl.$isEmpty(value) || isValidNumber;
           ctrl.$setValidity('phoneNumber', valid);
           return value;
         }

@@ -18,6 +18,7 @@ angular.module('cwill747.phonenumber', [])
     }
 
     function applyPhoneMask(value, region) {
+      //region can be null, formatAsTyped can handle it
       var phoneMask = value;
       try {
         phoneMask = $window.phoneUtils.formatAsTyped(value, region);
@@ -37,7 +38,7 @@ angular.module('cwill747.phonenumber', [])
       },
       controllerAs: '',
       controller: function() {
-        this.countryCode = this.countryCode || 'us';
+        //allow countryCode to be null
       },
       link: function(scope, element, attrs, ctrl) {
         var el = element[0];
@@ -96,14 +97,18 @@ angular.module('cwill747.phonenumber', [])
         }
 
         function validator(value) {
-          var isValidForRegion = false;
+          var isValidNumber = false;
           try {
-            isValidForRegion = $window.phoneUtils.isValidNumberForRegion(value, scope.countryCode);
+            if (scope.countryCode) {
+              isValidNumber = $window.phoneUtils.isValidNumberForRegion(value, scope.countryCode);
+            } else {
+              isValidNumber = $window.phoneUtils.isValidNumber(value);
+            }
           }
           catch (err) {
             $log.debug(err);
           }
-          var valid = ctrl.$isEmpty(value) || isValidForRegion;
+          var valid = ctrl.$isEmpty(value) || isValidNumber;
           ctrl.$setValidity('phoneNumber', valid);
           return value;
         }
